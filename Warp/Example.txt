@@ -1,0 +1,18 @@
+Animals = {'WL_3547273-LR'};
+Dates = {'190107'};
+
+for ii = 1:length(Animals)
+    Animal = Animals{ii};
+    for jj = 1:length(Dates)
+        Date = Dates{jj};
+        islocal = false;
+        foldername = fullfile('F:\Data\MotionCorrection\',Animal,Date,'Rec_1\Z2\motioncorrected_tiff');
+        local2savefoldername = fullfile('F:\Data\MotionCorrection\',[Animal '_Warp'],Date,'Rec_1\Z2\motioncorrected_tiff');
+        rl_RemovingPix = 0;
+        block_size = 6;
+        overlap_npix = 10;
+        n_split4warpinit = 1;
+        
+        CR_warp_Npatches_RH4tscc(islocal, foldername, local2savefoldername, rl_RemovingPix, block_size, overlap_npix, n_split4warpinit);
+    end
+end
