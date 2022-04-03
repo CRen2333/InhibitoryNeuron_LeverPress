@@ -1,4 +1,4 @@
-%% 2P Data VIP
+%% 2P Data VIP (data: Mendeley Data, V1, doi: 10.17632/tcnk38zkyz.1)
 %% Get activity aligned to movement onset
 clear all;
 close all;
