@@ -1,4 +1,4 @@
-%% 2P Data SOM
+%% 2P Data SOM (data: Mendeley Data, V1, doi: 10.17632/tcnk38zkyz.1)
 clear all;
 close all;
 clc;
