@@ -47,7 +47,7 @@ for ii = 1:26
     xticks([]); yticks([]);
 end
 
-%% Plot Figure S2D, SOM GC6f example images aligned to movement onset
+%% Plot Figure S2D, PV GC6f example images aligned to movement onset
 % Example: CR_3233232-O, session 1
 load('FigureS2D.mat');
 figure; hold on; set(gcf,'pos',[1400,100,800,600]);
