@@ -1,4 +1,3 @@
-% (data: Mendeley Data, V1, doi: 10.17632/tcnk38zkyz.1)
 % Clean
 clear all
 close all
@@ -397,17 +396,17 @@ for kk = 1:76
         [bootstat,~] = bootstrp(20000,@mean,temp_diff);
         p_kk(ii-1,kk) = min(sum(bootstat<0),sum(bootstat>0))/20000;
     end
-    [FDR] = mafdr(p_kk(:,kk),'BHFDR',true);
-    p_kk(:,kk) = FDR;
 end
+FDR = mafdr(p_kk(:),'BHFDR',true);
+FDR = reshape(FDR,[3,76]);
 for kk = 1:76
-    if p_kk(1,kk)<0.025
+    if FDR(1,kk)<0.025
         plot(kk,0.0155,'.','color',[0.7,0.7,0.7])
     end
-    if p_kk(2,kk)<0.025
+    if FDR(2,kk)<0.025
         plot(kk,0.016,'.','color',[0.4,0.4,0.4])
     end
-    if p_kk(3,kk)<0.025
+    if FDR(3,kk)<0.025
         plot(kk,0.0165,'.','color',[0,0,0])
     end
 end
