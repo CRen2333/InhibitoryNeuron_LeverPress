@@ -32,9 +32,7 @@ for curr_animal = 1:length(Animals)
             % load df/f
             if ~exist([df_f_Path filesep Animal '_' Date '_ROI_Traces.mat'])
                 df_f_MovOnset_Alinged{curr_field,curr_date} = [];
-                ZScore_MovOnset_Alinged{curr_field,curr_date} = [];
                 df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date} = [];
-                ZScore_MovOnset_Alinged_EachROI_MeanAXTrial = [];
                 continue
             end
             load([df_f_Path filesep Animal '_' Date '_ROI_Traces.mat'],'roi_trace_df_2','truncatePoint','-mat');
@@ -135,11 +133,11 @@ for curr_animal = 1:length(Animals)
                 
     end
     % Average
-    for ii = 1:4
+    for ii = 1:4 % average within each session first
         Post_MovOnset_Aligend_df_stage_Mean(curr_animal,ii) = nanmean(cellfun(@mean, Post_MovOnset_Aligend_df_field_stage{curr_animal}{1,ii}));
         Post_MovOnset_Aligend_df_stage_sub_Mean(curr_animal,ii) = nanmean(cellfun(@mean, Post_MovOnset_Aligend_df_field_stage_sub{curr_animal}{1,ii}));
     end
-    for ii = 1:4
+    for ii = 1:4 % pool across sessions then average
         Post_MovOnset_Aligend_df_stage_Mean_2(curr_animal,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field_stage{curr_animal}{1,ii}));
         Post_MovOnset_Aligend_df_stage_sub_Mean_2(curr_animal,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field_stage_sub{curr_animal}{1,ii}));
     end
