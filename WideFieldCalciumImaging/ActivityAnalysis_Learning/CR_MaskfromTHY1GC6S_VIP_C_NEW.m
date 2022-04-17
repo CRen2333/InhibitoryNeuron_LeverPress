@@ -22,19 +22,14 @@ for curr_animal = 1:length(Animals)
     Animal = Animals{curr_animal};
     cd(['Z:\People\Chi\WFLP_IN\' IN filesep Initial '_' Animal filesep 'EventAligned_Gap500']);
     if OP
-        load([Initial '_' Animal '_ROI_df_f_OPExclude'],'df_f_ROI_sub_1st_trial_arranged','df_f_ROI_trial_arranged','-mat');
+        load([Initial '_' Animal '_ROI_df_f_OPExclude'],'df_f_ROI_trial_arranged','-mat');
     else
-        load([Initial '_' Animal '_ROI_df_f'],'df_f_ROI_sub_1st_trial_arranged','df_f_ROI_trial_arranged','-mat');
+        load([Initial '_' Animal '_ROI_df_f'],'df_f_ROI_trial_arranged','-mat');
     end
     load([Initial '_' Animal '_Mask_from_Thy1GC6s'],'Final_Mask','-mat')
     for curr_ROI = 1:length(ROI)
-        Cued_subtract_1st_ROI_df_f_arranged{curr_ROI}{curr_animal} = df_f_ROI_sub_1st_trial_arranged{curr_ROI};
-        Cued_ROI_df_f_arranged{curr_ROI}{curr_animal} = df_f_ROI_trial_arranged{curr_ROI};
-        NaivePre = nanmean(nanmean(Cued_ROI_df_f_arranged{curr_ROI}{curr_animal}{1}(:,1:15)));
-        
+        Cued_ROI_df_f_arranged{curr_ROI}{curr_animal} = df_f_ROI_trial_arranged{curr_ROI};        
         for curr_session = 1:11
-            Cued_subtract_NaivePre_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session} = ...
-                Cued_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session} - NaivePre;
             baseline_mean = nanmean(Cued_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session}(:,baseline_frame),2);
             Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session} = ...
                 Cued_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session} - repmat(baseline_mean,1,76);
@@ -42,7 +37,7 @@ for curr_animal = 1:length(Animals)
         ROI_Mask{curr_ROI}{curr_animal} = Final_Mask{curr_ROI};
         ROI_Area(curr_ROI,curr_animal) = sum(sum(Final_Mask{curr_ROI}));
     end
-    clear df_f_ROI_sub_1st_trial_arranged Final_Mask
+    clear df_f_ROI_trial_arranged Final_Mask
 end   
 
 cd(['Z:\People\Chi\WFLP_IN\' IN filesep 'Craniotomy' filesep 'GAP500LEEWAY150_THY1MASK']);
@@ -51,7 +46,7 @@ if OP
 else
     SaveName = [IN '_Activity_THY1MASK'];
 end
-save(SaveName,'Animals','Initial','IN','Cued_subtract_1st_ROI_df_f_arranged','Cued_ROI_df_f_arranged','Cued_subtract_ROI_df_f_arranged','ROI_Mask','ROI_Area','-v7.3');
+save(SaveName,'Animals','Initial','IN','Cued_ROI_df_f_arranged','Cued_subtract_ROI_df_f_arranged','ROI_Mask','ROI_Area','-v7.3');
 
 %% Activity level
 % Exclude animals with module < 10 pixels
@@ -60,20 +55,8 @@ animalID = [1:length(Animals)];
 animalID = animalID(~index);
 for curr_ROI = 1:length(ROI)
     for curr_session = 1:11
-        Mean_Cued_subtract_1st_ROI_df_f_arranged{curr_ROI}{curr_session} = [];
-        Mean_Cued_ROI_df_f_arranged{curr_ROI}{curr_session} = [];
-        Mean_Cued_subtract_NaivePre_ROI_df_f_arranged{curr_ROI}{curr_session} = [];
         Mean_Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_session} = [];
         for curr_animal = 1:length(animalID)
-            temp = nanmean(Cued_subtract_1st_ROI_df_f_arranged{curr_ROI}{animalID(curr_animal)}{curr_session},1);
-            Mean_Cued_subtract_1st_ROI_df_f_arranged{curr_ROI}{curr_session} = [Mean_Cued_subtract_1st_ROI_df_f_arranged{curr_ROI}{curr_session};temp];
-            clear temp;
-            temp = nanmean(Cued_ROI_df_f_arranged{curr_ROI}{animalID(curr_animal)}{curr_session},1);
-            Mean_Cued_ROI_df_f_arranged{curr_ROI}{curr_session} = [Mean_Cued_ROI_df_f_arranged{curr_ROI}{curr_session};temp];
-            clear temp;
-            temp = nanmean(Cued_subtract_NaivePre_ROI_df_f_arranged{curr_ROI}{animalID(curr_animal)}{curr_session},1);
-            Mean_Cued_subtract_NaivePre_ROI_df_f_arranged{curr_ROI}{curr_session} = [Mean_Cued_subtract_NaivePre_ROI_df_f_arranged{curr_ROI}{curr_session};temp];
-            clear temp;
             temp = nanmean(Cued_subtract_ROI_df_f_arranged{curr_ROI}{animalID(curr_animal)}{curr_session},1);
             Mean_Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_session} = [Mean_Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_session};temp];
             clear temp;
@@ -99,30 +82,12 @@ for curr_animal = 1:length(animalID)
     end
 end
 
-colorvalue = colormap(hot);
-for curr_animal = 1:length(animalID)
-    figure(animalID(curr_animal)); set(gcf,'color','w','position',[50 50 1000 600]);
-    for curr_ROI = 1:length(ROI)
-        subplot(4,4,curr_ROI)
-        for curr_session = 1:11
-            hold on; plot(Mean_Cued_ROI_df_f_arranged{curr_ROI}{curr_session}(curr_animal,:),'color',colorvalue(curr_session*5,:));
-            xlim([1 76]);
-        end
-        title(ROI{curr_ROI});
-    end
-    if OP
-        savefig(gcf,[Animals{animalID(curr_animal)} '_ModeActivity_nosub_OP.fig']); close all;
-    else
-        savefig(gcf,[Animals{animalID(curr_animal)} '_ModeActivity_nosub.fig']); close all;
-    end
-end
-
 %% Activity level during movement, baseline subtracted
 for curr_ROI = 1:length(ROI)
     for curr_session = 1:11
         Cued_subtract_prepActivity{curr_ROI}{curr_session} = [];
         for curr_animal = 1:length(animalID)
-            if size(Cued_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session},1) <= 1
+            if size(Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session},1) <= 1
                 temp = nan(1,15);
             else
                 temp = Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session}(:,1:15);
@@ -151,8 +116,8 @@ for curr_ROI = 1:length(ROI)
     for curr_session = 1:11
         Cued_subtract_postActivity{curr_ROI}{curr_session} = [];
         for curr_animal = animalID
-            TrialNum(curr_animal,curr_session) = size(Cued_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session},1);
-            if size(Cued_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session},1) <= 1
+            TrialNum(curr_animal,curr_session) = size(Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session},1);
+            if size(Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session},1) <= 1
                 temp = nan(1,61);
             else
                 temp = Cued_subtract_ROI_df_f_arranged{curr_ROI}{curr_animal}{curr_session}(:,16:end);

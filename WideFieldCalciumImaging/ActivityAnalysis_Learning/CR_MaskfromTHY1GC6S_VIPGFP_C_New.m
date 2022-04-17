@@ -215,7 +215,7 @@ savefig(gcf,['Nai_VIP_PostMovActivityTemporal_subtract_baseline_OPExclude_postIC
 saveas(gcf,['Nai_VIP_PostMovActivityTemporal_subtract_baseline_OPExclude_postICA.png']);
 print('Nai_VIP_PostMovActivityTemporal_subtract_baseline_OPExclude_postICA.pdf','-dpdf','-bestfit'); pause(1);
 
-% norm, average across animals
+% normalize to GC6f, average across regions and animals
 VIP.PostActivity_corticalMean = nanmean(VIP.PostActivity{1},2);
 VIP_GFP.PostActivity_corticalMean = nanmean(VIP_GFP.PostActivity,2);
 naive_activity = nanmean(VIP.PostActivity_corticalMean);
@@ -237,7 +237,7 @@ savefig(gcf,['VIP_PostMovActivity_sub_baseline_OPExclude_postICA_norm_corticalMe
 saveas(gcf,['VIP_PostMovActivity_sub_baseline_OPExclude_postICA_norm_corticalMean.png']);
 saveas(gcf,['VIP_PostMovActivity_sub_baseline_OPExclude_postICA_norm_corticalMean.pdf']);
 
-% norm, average across modules
+% norm to GC6f, average across modules
 VIP.PostActivity_corticalMean_modules = nanmean(VIP.PostActivity{1},1);
 VIP_GFP.PostActivity_corticalMean_modules = nanmean(VIP_GFP.PostActivity,1);
 naive_activity = VIP.PostActivity_corticalMean_modules;
