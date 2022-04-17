@@ -1,4 +1,4 @@
-%% 2P Data VIP (data: Mendeley Data, V1, doi: 10.17632/tcnk38zkyz.1)
+%% 2P Data VIP
 %% Get activity aligned to movement onset
 clear all;
 close all;
@@ -49,11 +49,7 @@ for curr_animal = 1:length(Animals)
             % load df/f
             if ~exist([df_f_Path filesep Animal '_' Date '_ROI_Traces.mat'])
                 df_f_MovOnset_Alinged{curr_field,curr_date} = [];
-                CaEvents_MovOnset_Alinged{curr_field,curr_date} = [];
-                ZScore_MovOnset_Alinged{curr_field,curr_date} = [];
                 df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date} = [];
-                CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date} = [];
-                ZScore_MovOnset_Alinged_EachROI_MeanAXTrial = [];
                 continue
             end
             load([df_f_Path filesep Animal '_' Date '_ROI_Traces.mat'],'roi_trace_df_2','CaEvents_2','ZScore_2','truncatePoint','-mat');
@@ -66,30 +62,20 @@ for curr_animal = 1:length(Animals)
                 FrameOnset_index{curr_session} = FrameOnset_index{curr_session}(:,start_control);
                 for roi = 1:size(roi_trace_df_2{curr_session},1)
                     temp_trace = roi_trace_df_2{curr_session}(roi,:);
-                    temp_CaEvents = CaEvents_2{curr_session}(roi,:);
-                    temp_ZScore = ZScore_2{curr_session}(roi,:);
                     for trial = 1:size(FrameOnset_index{curr_session},2)
                         df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_trace(FrameOnset_index{curr_session}(:,trial));
-                        CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_CaEvents(FrameOnset_index{curr_session}(:,trial));
-                        ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_ZScore(FrameOnset_index{curr_session}(:,trial));
                     end
                     clear temp_trace temp_CaEvents temp_ZScore
                 end
             end
             for roi = 1:size(roi_trace_df_2{curr_session},1)
                 df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1});
-                CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1});
-                ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1});
                 df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);
-                CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);
-                ZScore_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);                
             end
         end        
     end
     TargetPath = fullfile('Z:\People\Chi\TwoP_IN\',IN,Animal,'df_f');
-    save([TargetPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','df_f_MovOnset_Alinged_EachROI_MeanAXTrial',...
-        'CaEvents_MovOnset_Alinged','CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial',...
-        'ZScore_MovOnset_Alinged','ZScore_MovOnset_Alinged_EachROI_MeanAXTrial','-v7.3');
+    save([TargetPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','df_f_MovOnset_Alinged_EachROI_MeanAXTrial','-v7.3');
 end
 
 %% Averaged activity after movement onset, combine trials across sessions first then average
@@ -105,14 +91,12 @@ Fields = {'Field_1','Field_2','Field_3','Field_4'};
 for curr_animal = 1:length(Animals)
     Animal = Animals{curr_animal};
     DataPath = fullfile('Z:\People\Chi\TwoP_IN\',IN,Animal,'df_f');
-    load([DataPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','CaEvents_MovOnset_Alinged','ZScore_MovOnset_Alinged','-mat');
+    load([DataPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','-mat');
     for curr_field = 1:size(df_f_MovOnset_Alinged,1)
         nan_cells{curr_animal,1}{curr_field,1} = [];
         for curr_session = 1:size(df_f_MovOnset_Alinged(curr_field,:),2)
             if isempty(df_f_MovOnset_Alinged{curr_field,curr_session})
                 Post_MovOnset_Aligend_df_field{curr_animal}{curr_field,curr_session} = [];
-                Post_MovOnset_Aligend_Ca_field{curr_animal}{curr_field,curr_session} = [];
-                Post_MovOnset_Aligend_ZS_field{curr_animal}{curr_field,curr_session} = [];                
                 continue
             end
             if size(df_f_MovOnset_Alinged{curr_field,curr_session}{1},1) == 36
@@ -127,18 +111,7 @@ for curr_animal = 1:length(Animals)
                 Post_MovOnset_Aligend_df_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(MovOnset_Frame:end,:)-...
                     repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(MovOnset_Frame:end,:),1),1),1);
                 Pre_MovOnset_Aligend_df_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(1:MovOnset_Frame-1,:)-...
-                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(1:MovOnset_Frame-1,:),1),1),1);
-                temp = CaEvents_MovOnset_Alinged{curr_field,curr_session}{curr_roi};
-                Post_MovOnset_Aligend_Ca_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(MovOnset_Frame:end,:)-...
-                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(MovOnset_Frame:end,:),1),1),1);
-                Pre_MovOnset_Aligend_Ca_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(1:MovOnset_Frame-1,:)-...
-                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(1:MovOnset_Frame-1,:),1),1),1);
-                temp = ZScore_MovOnset_Alinged{curr_field,curr_session}{curr_roi};
-                Post_MovOnset_Aligend_ZS_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(MovOnset_Frame:end,:)-...
-                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(MovOnset_Frame:end,:),1),1),1);
-                Pre_MovOnset_Aligend_ZS_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(1:MovOnset_Frame-1,:)-...
-                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(1:MovOnset_Frame-1,:),1),1),1);
-               
+                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(1:MovOnset_Frame-1,:),1),1),1);               
             end
         end
         % Get 4 stages first
@@ -146,55 +119,27 @@ for curr_animal = 1:length(Animals)
         Post_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(:,2) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,2:4)),2);
         Post_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(:,3) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,5:8)),2);
         Post_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(:,4) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,9:end)),2);
-        Post_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(:,1) = nanmean(cell2mat(Post_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,1)),2);
-        Post_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(:,2) = nanmean(cell2mat(Post_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,2:4)),2);
-        Post_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(:,3) = nanmean(cell2mat(Post_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,5:8)),2);
-        Post_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(:,4) = nanmean(cell2mat(Post_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,9:end)),2);
-        Post_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(:,1) = nanmean(cell2mat(Post_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,1)),2);
-        Post_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(:,2) = nanmean(cell2mat(Post_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,2:4)),2);
-        Post_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(:,3) = nanmean(cell2mat(Post_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,5:8)),2);
-        Post_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(:,4) = nanmean(cell2mat(Post_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,9:end)),2);
         [nan_index,~] = find(isnan(Post_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}));
         nan_cells{curr_animal,1}{curr_field,1} = [nan_cells{curr_animal,1}{curr_field,1}, nan_index];
         nan_cells{curr_animal,1}{curr_field,1} = unique(nan_cells{curr_animal,1}{curr_field,1});
         Post_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        Post_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        Post_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
         
         Pre_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(:,1) = nanmean(cell2mat(Pre_MovOnset_Aligend_df_field{curr_animal}(curr_field,1)),2);
         Pre_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(:,2) = nanmean(cell2mat(Pre_MovOnset_Aligend_df_field{curr_animal}(curr_field,2:4)),2);
         Pre_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(:,3) = nanmean(cell2mat(Pre_MovOnset_Aligend_df_field{curr_animal}(curr_field,5:8)),2);
         Pre_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(:,4) = nanmean(cell2mat(Pre_MovOnset_Aligend_df_field{curr_animal}(curr_field,9:end)),2);
-        Pre_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(:,1) = nanmean(cell2mat(Pre_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,1)),2);
-        Pre_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(:,2) = nanmean(cell2mat(Pre_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,2:4)),2);
-        Pre_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(:,3) = nanmean(cell2mat(Pre_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,5:8)),2);
-        Pre_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(:,4) = nanmean(cell2mat(Pre_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,9:end)),2);
-        Pre_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(:,1) = nanmean(cell2mat(Pre_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,1)),2);
-        Pre_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(:,2) = nanmean(cell2mat(Pre_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,2:4)),2);
-        Pre_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(:,3) = nanmean(cell2mat(Pre_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,5:8)),2);
-        Pre_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(:,4) = nanmean(cell2mat(Pre_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,9:end)),2);
         
         Pre_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        Pre_MovOnset_Aligend_Ca_field_stage{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        Pre_MovOnset_Aligend_ZS_field_stage{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
         
         NeuronNum{curr_animal}(curr_field) = size(Post_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1},1);        
     end
     % Pool fields
     Post_MovOnset_Aligend_df_stage{curr_animal} = cell2mat(Post_MovOnset_Aligend_df_field_stage{curr_animal});
-    Post_MovOnset_Aligend_Ca_stage{curr_animal} = cell2mat(Post_MovOnset_Aligend_Ca_field_stage{curr_animal});
-    Post_MovOnset_Aligend_ZS_stage{curr_animal} = cell2mat(Post_MovOnset_Aligend_ZS_field_stage{curr_animal});
     Pre_MovOnset_Aligend_df_stage{curr_animal} = cell2mat(Pre_MovOnset_Aligend_df_field_stage{curr_animal});
-    Pre_MovOnset_Aligend_Ca_stage{curr_animal} = cell2mat(Pre_MovOnset_Aligend_Ca_field_stage{curr_animal});
-    Pre_MovOnset_Aligend_ZS_stage{curr_animal} = cell2mat(Pre_MovOnset_Aligend_ZS_field_stage{curr_animal});
     % Average
     Post_MovOnset_Aligend_df_stage_Mean(curr_animal,:) = nanmean(Post_MovOnset_Aligend_df_stage{curr_animal});
-    Post_MovOnset_Aligend_Ca_stage_Mean(curr_animal,:) = nanmean(Post_MovOnset_Aligend_Ca_stage{curr_animal});
-    Post_MovOnset_Aligend_ZS_stage_Mean(curr_animal,:) = nanmean(Post_MovOnset_Aligend_ZS_stage{curr_animal});
     Pre_MovOnset_Aligend_df_stage_Mean(curr_animal,:) = nanmean(Pre_MovOnset_Aligend_df_stage{curr_animal});
-    Pre_MovOnset_Aligend_Ca_stage_Mean(curr_animal,:) = nanmean(Pre_MovOnset_Aligend_Ca_stage{curr_animal});
-    Pre_MovOnset_Aligend_ZS_stage_Mean(curr_animal,:) = nanmean(Pre_MovOnset_Aligend_ZS_stage{curr_animal});
-    clear df_f_MovOnset_Alinged CaEvents_MovOnset_Alinged ZScore_MovOnset_Alinged
+    clear df_f_MovOnset_Alinged
 end
 
 %% Pool neurons across animals
@@ -380,26 +325,6 @@ end
 saveas(gcf, [FigurePath filesep 'Pool_' IN '_MeanXTrial_dfof_conc.fig']); pause(1);
 saveas(gcf, [FigurePath filesep 'Pool_' IN '_MeanXTrial_dfof_conc.png']); pause(1);
 saveas(gcf, [FigurePath filesep 'Pool_' IN '_MeanXTrial_dfof_conc.pdf']); pause(1);
-
-for ii = 1:length(Animals)
-    temp_tag(:,ii) = Animal_tag(I_naive)==ii;
-end
-window_size = 50;
-for ii = 1:length(Animals)
-    Animal_tag_prob_sort(:,ii) = movsum(temp_tag(:,ii),window_size)/sum(temp_tag(:,ii));
-%     Animal_tag_prob_sort(:,ii) = movsum(temp_tag(:,ii),window_size)/window_size;
-end
-figure; hold on; set(gcf,'color','w','position',[50 50 100 500]);
-Animals_color = colormap;
-Animals_color = Animals_color(16:8:64,:);
-for ii = 1:length(Animals)
-    plot(Animal_tag_prob_sort(:,ii),[1:length(Animal_tag_prob_sort(:,ii))],'color',Animals_color(ii,:));
-end
-xlim([0 0.25]);ylim([1 length(Animal_tag)]);set(gca,'ydir','reverse');
-xlabel('Prob.');title('Animal ID');
-saveas(gcf, [FigurePath filesep 'Pool_' IN '_MeanXTrial_dfof_conc_AnimalID.fig']); pause(1);
-saveas(gcf, [FigurePath filesep 'Pool_' IN '_MeanXTrial_dfof_conc_AnimalID.png']); pause(1);
-saveas(gcf, [FigurePath filesep 'Pool_' IN '_MeanXTrial_dfof_conc_AnimalID.pdf']); pause(1);
 
 figure; hold on; set(gcf,'color','w','position',[200 200 200 200]);
 for ii = 1:4
