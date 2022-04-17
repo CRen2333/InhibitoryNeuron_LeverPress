@@ -14,7 +14,6 @@ SOM_Combine.RwdMov_Duration = [SOM.CRM_Dur(:,session_control);SOM_2P.RwdMov_Dura
 SOM_Combine.LeverCorr_Reward_within = [SOM.Corr_Reward_within(:,session_control);SOM_2P.LeverCorr_Reward_within];
 SOM_Combine.LeverCorr_Reward_across = [SOM.Corr_Reward_across(:,session_control_2);SOM_2P.LeverCorr_Reward_across];
 SOM_Combine.RwdMVM_Rwd = [SOM.CuedRewardedMov_to_Reward(:,session_control);SOM_2P.RwdMVM_Rwd];
-SOM_Combine.MovSpeed = [SOM.MovSpeed(:,session_control);SOM_2P.RwdMVM_speed];
 SOM_Combine.TrialNum = [SOM.TrialNum(:,session_control);SOM_2P.TrialNum];
 
 VIP_Combine.CR = [VIP.CR(:,session_control);VIP_2P.CR];
@@ -25,7 +24,6 @@ VIP_Combine.RwdMov_Duration = [VIP.CRM_Dur(:,session_control);VIP_2P.RwdMov_Dura
 VIP_Combine.LeverCorr_Reward_within = [VIP.Corr_Reward_within(:,session_control);VIP_2P.LeverCorr_Reward_within];
 VIP_Combine.LeverCorr_Reward_across = [VIP.Corr_Reward_across(:,session_control_2);VIP_2P.LeverCorr_Reward_across];
 VIP_Combine.RwdMVM_Rwd = [VIP.CuedRewardedMov_to_Reward(:,session_control);VIP_2P.RwdMVM_Rwd];
-VIP_Combine.MovSpeed = [VIP.MovSpeed(:,session_control);VIP_2P.RwdMVM_speed];
 VIP_Combine.TrialNum = [VIP.TrialNum(:,session_control);VIP_2P.TrialNum];
 
 Combine.CR = [VIP_Combine.CR;SOM_Combine.CR];
@@ -36,7 +34,6 @@ Combine.RwdMov_Duration = [VIP_Combine.RwdMov_Duration;SOM_Combine.RwdMov_Durati
 Combine.LeverCorr_Reward_within = [VIP_Combine.LeverCorr_Reward_within;SOM_Combine.LeverCorr_Reward_within];
 Combine.LeverCorr_Reward_across = [VIP_Combine.LeverCorr_Reward_across;SOM_Combine.LeverCorr_Reward_across];
 Combine.RwdMVM_Rwd = [VIP_Combine.RwdMVM_Rwd;SOM_Combine.RwdMVM_Rwd];
-Combine.MovSpeed = [VIP_Combine.MovSpeed;SOM_Combine.MovSpeed];
 Combine.TrialNum = [VIP_Combine.TrialNum;SOM_Combine.TrialNum];
 
 % Matrix
