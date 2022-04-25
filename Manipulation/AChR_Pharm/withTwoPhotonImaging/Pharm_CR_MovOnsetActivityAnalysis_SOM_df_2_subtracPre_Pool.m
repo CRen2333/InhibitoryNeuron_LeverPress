@@ -63,11 +63,7 @@ for curr_animal = 1:length(Animals)
             % load df/f
             if ~exist([df_f_Path filesep Animal '_' Date '_ROI_Traces.mat'])
                 df_f_MovOnset_Alinged{curr_field,curr_date} = [];
-                CaEvents_MovOnset_Alinged{curr_field,curr_date} = [];
-                ZScore_MovOnset_Alinged{curr_field,curr_date} = [];
                 df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date} = [];
-                CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date} = [];
-                ZScore_MovOnset_Alinged_EachROI_MeanAXTrial = [];
                 continue
             end
             load([df_f_Path filesep Animal '_' Date '_ROI_Traces.mat'],'roi_trace_df_2','CaEvents_2','ZScore_2','truncatePoint','-mat');
@@ -80,30 +76,20 @@ for curr_animal = 1:length(Animals)
                 FrameOnset_index{curr_session} = FrameOnset_index{curr_session}(:,start_control);
                 for roi = 1:size(roi_trace_df_2{curr_session},1)
                     temp_trace = roi_trace_df_2{curr_session}(roi,:);
-                    temp_CaEvents = CaEvents_2{curr_session}(roi,:);
-                    temp_ZScore = ZScore_2{curr_session}(roi,:);
                     for trial = 1:size(FrameOnset_index{curr_session},2)
                         df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_trace(FrameOnset_index{curr_session}(:,trial));
-                        CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_CaEvents(FrameOnset_index{curr_session}(:,trial));
-                        ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_ZScore(FrameOnset_index{curr_session}(:,trial));
                     end
                     clear temp_trace temp_CaEvents temp_ZScore
                 end
             end
             for roi = 1:size(roi_trace_df_2{curr_session},1)
                 df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1});
-                CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1});
-                ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1});
                 df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);
-                CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);
-                ZScore_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);                
             end
         end        
     end
     TargetPath = fullfile('Z:\People\Chi\TwoP_IN\',IN,Animal,'Pharm',SessionType_2,'df_f');
-    save([TargetPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','df_f_MovOnset_Alinged_EachROI_MeanAXTrial',...
-        'CaEvents_MovOnset_Alinged','CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial',...
-        'ZScore_MovOnset_Alinged','ZScore_MovOnset_Alinged_EachROI_MeanAXTrial','-v7.3');
+    save([TargetPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','df_f_MovOnset_Alinged_EachROI_MeanAXTrial','-v7.3');
 end
 
 %% Averaged activity after movement onset, combine trials across sessions first then average
@@ -119,20 +105,12 @@ switch SessionType
         Animals = {'CR_3672035-R','CR_3702224-O','CR_3702224-L','CR_3702224-R','CR_3702226-O','CR_3886982-O','CR_3886982-L','CR_3886982-LR','CR_3886982-R','CR_3887040-O','CR_3887040-L'};
         Drug = 'Ant';
         Post_MovOnset_Aligend_df_Pharm_Mean = nan(length(Animals),2);
-        Post_MovOnset_Aligend_Ca_Pharm_Mean = nan(length(Animals),2);
-        Post_MovOnset_Aligend_ZS_Pharm_Mean = nan(length(Animals),2);
         Post_MovOnset_Aligend_df_sub_Pharm_Mean = nan(length(Animals),2);
-        Post_MovOnset_Aligend_Ca_sub_Pharm_Mean = nan(length(Animals),2);
-        Post_MovOnset_Aligend_ZS_sub_Pharm_Mean = nan(length(Animals),2);
     case 'Exp_Ago'
         Animals = {'WL_3547273-LR','WL_3547272-O','WL_3547272-L','WL_3526578-O','WL_3526578-R','CR_3672035-R','CR_3702224-L','CR_3702224-O','CR_3702224-R','CR_3702226-O'};
         Drug = 'Ago';
         Post_MovOnset_Aligend_df_Pharm_Mean = nan(length(Animals),5);
-        Post_MovOnset_Aligend_Ca_Pharm_Mean = nan(length(Animals),5);
-        Post_MovOnset_Aligend_ZS_Pharm_Mean = nan(length(Animals),5);
         Post_MovOnset_Aligend_df_sub_Pharm_Mean = nan(length(Animals),5);
-        Post_MovOnset_Aligend_Ca_sub_Pharm_Mean = nan(length(Animals),5);
-        Post_MovOnset_Aligend_ZS_sub_Pharm_Mean = nan(length(Animals),5);
 end
 Fields = {'Field_1','Field_2'};
 
@@ -149,15 +127,13 @@ for curr_animal = 1:length(Animals)
             SessionType_2 = SessionType;
     end
     DataPath = fullfile('Z:\People\Chi\TwoP_IN\',IN,Animal,'Pharm',SessionType_2,'df_f');
-    load([DataPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','CaEvents_MovOnset_Alinged','ZScore_MovOnset_Alinged','-mat');
+    load([DataPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','-mat');
     load([DataPath filesep Animal '_ImagingInfo.mat'],'Imaging_Fields','-mat');    
     for curr_field = 1:size(df_f_MovOnset_Alinged,1)
         nan_cells{curr_animal,1}{curr_field,1} = [];
         for curr_session = 1:min(5,size(df_f_MovOnset_Alinged(curr_field,:),2))
             if isempty(df_f_MovOnset_Alinged{curr_field,curr_session})
                 Post_MovOnset_Aligend_df_field{curr_animal}{curr_field,curr_session} = [];
-                Post_MovOnset_Aligend_Ca_field{curr_animal}{curr_field,curr_session} = [];
-                Post_MovOnset_Aligend_ZS_field{curr_animal}{curr_field,curr_session} = [];                
                 continue
             end
             if size(df_f_MovOnset_Alinged{curr_field,curr_session}{1},1) == 36
@@ -173,17 +149,8 @@ for curr_animal = 1:length(Animals)
             for curr_roi = 1:size(df_f_MovOnset_Alinged{curr_field,curr_session},1)
                 temp = df_f_MovOnset_Alinged{curr_field,curr_session}{curr_roi};
                 Post_MovOnset_Aligend_df_field_sub{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(MovOnset_Frame:end,:)-...
-                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(MovOnset_Frame:end,:),1),1),1);
-                temp = CaEvents_MovOnset_Alinged{curr_field,curr_session}{curr_roi};
-                Post_MovOnset_Aligend_Ca_field_sub{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(MovOnset_Frame:end,:)-...
-                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(MovOnset_Frame:end,:),1),1),1);
-                temp = ZScore_MovOnset_Alinged{curr_field,curr_session}{curr_roi};
-                Post_MovOnset_Aligend_ZS_field_sub{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(temp(MovOnset_Frame:end,:)-...
-                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(MovOnset_Frame:end,:),1),1),1);
-               
+                    repmat(nanmean(temp(Baseline_Frame,:),1),size(temp(MovOnset_Frame:end,:),1),1),1);                
                 Post_MovOnset_Aligend_df_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(df_f_MovOnset_Alinged{curr_field,curr_session}{curr_roi}(MovOnset_Frame:end,:),1);
-                Post_MovOnset_Aligend_Ca_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(CaEvents_MovOnset_Alinged{curr_field,curr_session}{curr_roi}(MovOnset_Frame:end,:),1);
-                Post_MovOnset_Aligend_ZS_field{curr_animal}{curr_field,curr_session}(curr_roi,:) = nanmean(ZScore_MovOnset_Alinged{curr_field,curr_session}{curr_roi}(MovOnset_Frame:end,:),1);
             end
         end
 
@@ -191,65 +158,35 @@ for curr_animal = 1:length(Animals)
             temp = Post_MovOnset_Aligend_df_field_sub{curr_animal}(curr_field,:);
             Post_MovOnset_Aligend_df_field_sub{curr_animal}(curr_field,1) = temp(:,2);
             Post_MovOnset_Aligend_df_field_sub{curr_animal}(curr_field,2) = temp(:,1);
-            temp = Post_MovOnset_Aligend_Ca_field_sub{curr_animal}(curr_field,:);
-            Post_MovOnset_Aligend_Ca_field_sub{curr_animal}(curr_field,1) = temp(:,2);
-            Post_MovOnset_Aligend_Ca_field_sub{curr_animal}(curr_field,2) = temp(:,1);
-            temp = Post_MovOnset_Aligend_ZS_field_sub{curr_animal}(curr_field,:);
-            Post_MovOnset_Aligend_ZS_field_sub{curr_animal}(curr_field,1) = temp(:,2);
-            Post_MovOnset_Aligend_ZS_field_sub{curr_animal}(curr_field,2) = temp(:,1);
-            
+                  
             temp = Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,:);
             Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,1) = temp(:,2);
-            Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,2) = temp(:,1);
-            temp = Post_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,:);
-            Post_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,1) = temp(:,2);
-            Post_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,2) = temp(:,1);
-            temp = Post_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,:);
-            Post_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,1) = temp(:,2);
-            Post_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,2) = temp(:,1);
+            Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,2) = temp(:,1);            
         end            
             
         % Get mean then combine fields
         for ii = 1:length(Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,:))
-            Post_MovOnset_Aligend_df_field_sub_Pharm{curr_animal}{curr_field,1}(:,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field_sub{curr_animal}(curr_field,ii)),2);
-            Post_MovOnset_Aligend_Ca_field_sub_Pharm{curr_animal}{curr_field,1}(:,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_Ca_field_sub{curr_animal}(curr_field,ii)),2);
-            Post_MovOnset_Aligend_ZS_field_sub_Pharm{curr_animal}{curr_field,1}(:,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_ZS_field_sub{curr_animal}(curr_field,ii)),2);
-            
+            Post_MovOnset_Aligend_df_field_sub_Pharm{curr_animal}{curr_field,1}(:,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field_sub{curr_animal}(curr_field,ii)),2);            
             Post_MovOnset_Aligend_df_field_Pharm{curr_animal}{curr_field,1}(:,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,ii)),2);
-            Post_MovOnset_Aligend_Ca_field_Pharm{curr_animal}{curr_field,1}(:,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_Ca_field{curr_animal}(curr_field,ii)),2);
-            Post_MovOnset_Aligend_ZS_field_Pharm{curr_animal}{curr_field,1}(:,ii) = nanmean(cell2mat(Post_MovOnset_Aligend_ZS_field{curr_animal}(curr_field,ii)),2);
         end        
                         
         [nan_index,~] = find(isnan(sum(Post_MovOnset_Aligend_df_field_Pharm{curr_animal}{curr_field,1},2)));
         nan_cells{curr_animal,1}{curr_field,1} = [nan_cells{curr_animal,1}{curr_field,1}, nan_index];
         nan_cells{curr_animal,1}{curr_field,1} = unique(nan_cells{curr_animal,1}{curr_field,1});
         
-        Post_MovOnset_Aligend_df_field_sub_Pharm{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        Post_MovOnset_Aligend_Ca_field_sub_Pharm{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        Post_MovOnset_Aligend_ZS_field_sub_Pharm{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        
+        Post_MovOnset_Aligend_df_field_sub_Pharm{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];        
         Post_MovOnset_Aligend_df_field_Pharm{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        Post_MovOnset_Aligend_Ca_field_Pharm{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-        Post_MovOnset_Aligend_ZS_field_Pharm{curr_animal}{curr_field,1}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
         
         NeuronNum{curr_animal}(curr_field) = size(Post_MovOnset_Aligend_df_field_Pharm{curr_animal}{curr_field,1},1);        
     end
     
     % Pool fields
     Post_MovOnset_Aligend_df_sub_Pharm{curr_animal} = cell2mat(Post_MovOnset_Aligend_df_field_sub_Pharm{curr_animal});
-    Post_MovOnset_Aligend_Ca_sub_Pharm{curr_animal} = cell2mat(Post_MovOnset_Aligend_Ca_field_sub_Pharm{curr_animal});
-    Post_MovOnset_Aligend_ZS_sub_Pharm{curr_animal} = cell2mat(Post_MovOnset_Aligend_ZS_field_sub_Pharm{curr_animal});
     Post_MovOnset_Aligend_df_Pharm{curr_animal} = cell2mat(Post_MovOnset_Aligend_df_field_Pharm{curr_animal});
-    Post_MovOnset_Aligend_Ca_Pharm{curr_animal} = cell2mat(Post_MovOnset_Aligend_Ca_field_Pharm{curr_animal});
-    Post_MovOnset_Aligend_ZS_Pharm{curr_animal} = cell2mat(Post_MovOnset_Aligend_ZS_field_Pharm{curr_animal});
     % Average
     Post_MovOnset_Aligend_df_sub_Pharm_Mean(curr_animal,1:size(Post_MovOnset_Aligend_df_Pharm{curr_animal},2)) = nanmean(Post_MovOnset_Aligend_df_sub_Pharm{curr_animal});
-    Post_MovOnset_Aligend_Ca_sub_Pharm_Mean(curr_animal,1:size(Post_MovOnset_Aligend_df_Pharm{curr_animal},2)) = nanmean(Post_MovOnset_Aligend_Ca_sub_Pharm{curr_animal});
-    Post_MovOnset_Aligend_ZS_sub_Pharm_Mean(curr_animal,1:size(Post_MovOnset_Aligend_df_Pharm{curr_animal},2)) = nanmean(Post_MovOnset_Aligend_ZS_sub_Pharm{curr_animal});
     Post_MovOnset_Aligend_df_Pharm_Mean(curr_animal,1:size(Post_MovOnset_Aligend_df_Pharm{curr_animal},2)) = nanmean(Post_MovOnset_Aligend_df_Pharm{curr_animal});
-    Post_MovOnset_Aligend_Ca_Pharm_Mean(curr_animal,1:size(Post_MovOnset_Aligend_df_Pharm{curr_animal},2)) = nanmean(Post_MovOnset_Aligend_Ca_Pharm{curr_animal});
-    Post_MovOnset_Aligend_ZS_Pharm_Mean(curr_animal,1:size(Post_MovOnset_Aligend_df_Pharm{curr_animal},2)) = nanmean(Post_MovOnset_Aligend_ZS_Pharm{curr_animal});
-    clear df_f_MovOnset_Alinged CaEvents_MovOnset_Alinged ZScore_MovOnset_Alinged SessionTage Imaging_Fields
+    clear df_f_MovOnset_Alinged Imaging_Fields
 end
 
 %%
@@ -303,19 +240,18 @@ xlim([0.5,2.5]); xticks([1:2]); xticklabels(Pharms); ylabel('Mean df/f'); axis s
 ylim([0,0.1]);
 % yticks([0:0.1:0.3]);
 % random effect modal
-Task = repmat([0:1],size(temp_var,1),1);
-Task = Task(:);
+Task_drug = repmat([0:1],size(temp_var,1),1);
+Task_drug = Task_drug(:);
 Animals_test = [];
 for curr_animal = 1:length(Animals)
     Animals_test = [Animals_test;ones(size(Post_MovOnset_Aligend_df_sub_Pharm{curr_animal}))*curr_animal];
 end
 Animals_test = Animals_test(:);
 y = temp_var(:);
-tbl = table(Animals_test,Task,y);
+tbl = table(Animals_test,Task_drug,y);
 tbl.Animals_test = nominal(tbl.Animals_test);
-tbl.Task = nominal(tbl.Task);
-% lme = fitlme(tbl,'y ~ 1 + Task + (1|Animals_test)');
-lme = fitlme(tbl,'y ~ 1 + Task + (1|Animals_test)+(Task-1|Animals_test)');
+tbl.Task_drug = nominal(tbl.Task_drug);
+lme = fitlme(tbl,'y ~ 1 + Task_drug + (1|Animals_test)+(Task_drug-1|Animals_test)');
 [beta,betanames,stats] = fixedEffects(lme);
 pValue = stats.pValue
 text(1.5,0.1,['p =' num2str(pValue(2),'%.4f')],'color','k','HorizontalAlignment','center')
@@ -346,14 +282,14 @@ Animals_test = [];
 for curr_animal = 1:length(Animals)
     Animals_test = [Animals_test;ones(size(Post_MovOnset_Aligend_df_sub_Pharm{curr_animal},1),2)*curr_animal];
 end
-Task_test = repmat([0,1],size(temp_var,1),1);
+Task_drug = repmat([0,1],size(temp_var,1),1); % with or without drug
 y = temp_var(:);
 Animals_test = Animals_test(:);
-Task_test = Task_test(:);
-tbl = table(Animals_test,Task_test,y);
+Task_drug = Task_drug(:);
+tbl = table(Animals_test,Task_drug,y);
 tbl.Animals_test = nominal(tbl.Animals_test);
-tbl.Task_test = nominal(tbl.Task_test);
-lme = fitlme(tbl,'y ~ 1 + Task_test + (1|Animals_test)+(Task_test-1|Animals_test)');
+tbl.Task_drug = nominal(tbl.Task_drug);
+lme = fitlme(tbl,'y ~ 1 + Task_drug + (1|Animals_test)+(Task_drug-1|Animals_test)');
 [beta,betanames,stats] = fixedEffects(lme);
 pValue = stats.pValue
 text(-2,0.37,'p < 0.001','fontsize',6);

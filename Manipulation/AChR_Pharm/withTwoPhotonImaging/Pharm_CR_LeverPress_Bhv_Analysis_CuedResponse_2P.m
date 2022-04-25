@@ -6,38 +6,8 @@ close all;
 clc;
 
 IN = 'VIP';
-% Animals = {'CR_3702608-O','CR_3702608-LR'};
-% Animals = {'CR_3658844-L','CR_3658844-R'};
-% Animals = {'CR_3658844-L','CR_3658844-R','CR_3658845-R','CR_3672031-O'};
-% Animals = {'CR_3887044-O','CR_3887044-L'};
-% Animals = {'CR_3786160-LR'};
-% Animals = {'CR_3887043-O','CR_3887043-L','CR_3887041-O'};
-% SessionType = 'Nai_Ant';
-% Animals = {'CR_3672031-O'};
-% SessionType = 'Exp_Ago_Ant';
-% Animals = {'CR_3702608-LR'};
-% SessionType = 'Exp_Ant';
-% SessionType = 'Exp_Ago';
-% Animals = {'WL_3526642-R'};
-% SessionType = 'Nai_nAnt';
-% Animals = {'CR_4259757-R','CR_4302983-LL','CR_4302983-R'};
-% Animals = {'CR_4302984-O','CR_4302984-R','CR_4302984-LR'};
-% Animals = {'CR_4302984-R'};
-SessionType = 'Nai_mAnt';
-% Animals = {'CR_4303048-L','CR_4303048-R','CR_4303048-LR'};
 Animals = {'CR_4365784-O','CR_4365784-L','CR_4365807-O','CR_4365807-L'};
-% % IN = 'SOM';
-% Animals = {'CR_3672035-L','CR_3672035-R','CR_3702224-O','CR_3702224-L','CR_3702224-R','CR_3702226-O'};
-% Animals = {'CR_3886982-O','CR_3886982-L'}; 
-% Animals = {'CR_3886982-R','CR_3886982-LR'}; 
-% Animals = {'CR_3887040-O','CR_3887040-L'};
-% SessionType = 'Nai_Ant';
-% Animals = {'WL_3547273-LR','WL_3547272-O','WL_3547272-L','WL_3526578-O','WL_3526578-R'}; 
-% Animals = {'WL_3547272-O'};
-% SessionType = 'Exp_Ago';
-% Animals = {'CR_3672035-L','CR_3672035-R'};
-% Animals = {'CR_3702224-O','CR_3702224-L','CR_3702224-R','CR_3702226-O'};
-% SessionType = 'Exp_Ago_Ant';
+SessionType = 'Nai_mAnt';
 
 Gap = round(3*33.33)*5;
 MovDur = 200;
@@ -283,7 +253,6 @@ for curr_animal = 1:length(Animals)
             Reward_index = logical(CuedMov.Cued_MovOnset_Info_All(:,5));
             CuedMov.LeverTrace_Reward = CuedMov.LeverTrace_All(:,Reward_index);
             Temp_trace = resample(CuedMov.LeverTrace_Reward,1,Lever_downsamp);
-            % CuedMov.LeverTrace_Reward_downsample = Temp_trace(Sample_range_corr_R,:);
             CuedMov.LeverTrace_Reward_downsample = Temp_trace(Sample_range_corr,:);
         end
         
@@ -355,7 +324,11 @@ for curr_animal = 1:length(Animals)
                         temp_matrix = [];
                         temp_matrix = horzcat(CuedMov_SingleAnimal{curr_day_1}.LeverTrace_All_downsample, ...
                             CuedMov_SingleAnimal{curr_day_2}.LeverTrace_All_downsample);
-                        Trial_Trial_Corr_All(curr_day_1,curr_day_2) = CR_Get_Median_Corrcoef(temp_matrix);
+                        temp_corr_matrix = corrcoef(temp_matrix);
+                        trialnum_1 = size(CuedMov_SingleAnimal{curr_day_1}.LeverTrace_All_downsample,2);
+                        trialnum_2 = size(CuedMov_SingleAnimal{curr_day_2}.LeverTrace_All_downsample,2);
+                        temp_corr_matrix = temp_corr_matrix(1:trialnum_1,trialnum_1+1:end);                        
+                        Trial_Trial_Corr_All(curr_day_1,curr_day_2) = nanmedian(temp_corr_matrix(:));
                     end
                 end
             end
@@ -374,7 +347,11 @@ for curr_animal = 1:length(Animals)
                         temp_matrix = [];
                         temp_matrix = horzcat(CuedMov_SingleAnimal{curr_day_1}.LeverTrace_First_downsample, ...
                             CuedMov_SingleAnimal{curr_day_2}.LeverTrace_First_downsample);
-                        Trial_Trial_Corr_First(curr_day_1,curr_day_2) = CR_Get_Median_Corrcoef(temp_matrix);
+                        temp_corr_matrix = corrcoef(temp_matrix);
+                        trialnum_1 = size(CuedMov_SingleAnimal{curr_day_1}.LeverTrace_First_downsample,2);
+                        trialnum_2 = size(CuedMov_SingleAnimal{curr_day_2}.LeverTrace_First_downsample,2);
+                        temp_corr_matrix = temp_corr_matrix(1:trialnum_1,trialnum_1+1:end);                        
+                        Trial_Trial_Corr_First(curr_day_1,curr_day_2) = nanmedian(temp_corr_matrix(:));
                     end
                 end
             end
@@ -393,7 +370,11 @@ for curr_animal = 1:length(Animals)
                         temp_matrix = [];
                         temp_matrix = horzcat(CuedMov_SingleAnimal{curr_day_1}.LeverTrace_Reward_downsample, ...
                             CuedMov_SingleAnimal{curr_day_2}.LeverTrace_Reward_downsample);
-                        Trial_Trial_Corr_Reward(curr_day_1,curr_day_2) = CR_Get_Median_Corrcoef(temp_matrix);
+                        temp_corr_matrix = corrcoef(temp_matrix);
+                        trialnum_1 = size(CuedMov_SingleAnimal{curr_day_1}.LeverTrace_Reward_downsample,2);
+                        trialnum_2 = size(CuedMov_SingleAnimal{curr_day_2}.LeverTrace_Reward_downsample,2);
+                        temp_corr_matrix = temp_corr_matrix(1:trialnum_1,trialnum_1+1:end);                        
+                        Trial_Trial_Corr_Reward(curr_day_1,curr_day_2) = nanmedian(temp_corr_matrix(:));
                     end
                 end
             end
