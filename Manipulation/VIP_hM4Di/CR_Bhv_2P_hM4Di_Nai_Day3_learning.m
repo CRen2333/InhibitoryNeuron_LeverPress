@@ -13,7 +13,7 @@ for curr_animal = 1:length(Animals)
     disp(Animal);
     load(['Z:\People\Chi\TwoP_IN\' IN filesep Animal filesep Stage '\MovAnalysis\' Animal '_CuedMov_All.mat']);
     
-    for curr_day = 3:4 % collect day 3 and day 4 data
+    for curr_day = 3:4 % collect day 3 and 4 data (day 1 and day 2 after CNO sessions)
         ActiveTrials_binary{curr_animal,curr_day} = [];
         RwdTrials_binary{curr_animal,curr_day} = [];
         RspdTrials_binary{curr_animal,curr_day} = [];
@@ -77,10 +77,7 @@ for curr_animal = 1:length(Animals)
                 CuedRwdMvMTrials_binary{curr_animal,curr_day}{curr_session,1}(cued_rwdmvm_trial) = 1;
                 ActiveTrials_binary{curr_animal,curr_day}{curr_session,1} = logical(RspdTrials_binary{curr_animal,curr_day}{curr_session,1}+RwdTrials_binary{curr_animal,curr_day}{curr_session,1});
             end
-           
-
-            % Trace for moving average
-            
+                       
             % reaction time
             RT{curr_animal,curr_day}{curr_session,1}(:,1) = rspd_trial;
             RT{curr_animal,curr_day}{curr_session,1}(:,2) = temp_info(first_index,2)-temp_info(first_index,6);
@@ -134,7 +131,7 @@ for curr_animal = 1:length(Animals)
     clear temp_trace Trial_Trial_Corr_Reward Trial_Trial_Corr_First Trial_Trial_Corr_All CuedMov_SingleAnimal
 end
 
-save('BehaviorCollect_Nai_Learning_Day3.mat','-v7.3');
+save('VIP_SOM_Behavior_Nai_Day3_learning.mat','-v7.3');
 
 %% hM4Di
 Animals = Animals(1:22);

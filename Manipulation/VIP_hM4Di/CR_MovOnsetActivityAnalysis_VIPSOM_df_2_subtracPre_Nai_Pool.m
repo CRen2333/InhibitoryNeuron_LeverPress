@@ -47,11 +47,7 @@ for curr_animal = 1:length(Animals)
             % load df/f
             if ~exist([df_f_Path filesep Animal '_' Date '_ROI_Traces.mat'])
                 df_f_MovOnset_Alinged{curr_field,curr_date} = [];
-                CaEvents_MovOnset_Alinged{curr_field,curr_date} = [];
-                ZScore_MovOnset_Alinged{curr_field,curr_date} = [];
                 df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date} = [];
-                CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date} = [];
-                ZScore_MovOnset_Alinged_EachROI_MeanAXTrial = [];
                 continue
             end
             load([df_f_Path filesep Animal '_' Date '_ROI_Traces.mat'],'roi_trace_df_2','CaEvents_2','ZScore_2','truncatePoint','-mat');
@@ -66,34 +62,24 @@ for curr_animal = 1:length(Animals)
                 FrameOnset_index{curr_session} = FrameOnset_index{curr_session}(:,start_control);
                 for roi = 1:size(roi_trace_df_2{curr_session},1)
                     temp_trace = roi_trace_df_2{curr_session}(roi,:);
-                    temp_CaEvents = CaEvents_2{curr_session}(roi,:);
-                    temp_ZScore = ZScore_2{curr_session}(roi,:);
                     for trial = 1:size(FrameOnset_index{curr_session},2)
                         df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_trace(FrameOnset_index{curr_session}(:,trial));
-                        CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_CaEvents(FrameOnset_index{curr_session}(:,trial));
-                        ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1}{1,curr_session}(:,trial) = temp_ZScore(FrameOnset_index{curr_session}(:,trial));
                     end
                     clear temp_trace temp_CaEvents temp_ZScore
                 end
             end
             for roi = 1:size(roi_trace_df_2{curr_session},1)
                 df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1});
-                CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1});
-                ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1} = cell2mat(ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1});
                 % Get rid of noise, threshold = 20;
                 temp_index = abs(df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1})>=20;
                 df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1}(temp_index) = nan;
                 df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1}(:,sum(temp_index)>=(size(df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1},1)/2)) = nan;
                 df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(df_f_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);
-                CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(CaEvents_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);
-                ZScore_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_date}(roi,:) = nanmean(ZScore_MovOnset_Alinged{curr_field,curr_date}{roi,1},2);                
             end
         end        
     end
     TargetPath = fullfile('Z:\People\Chi\TwoP_IN\',IN,Animal,Stage,'df_f');
-    save([TargetPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','df_f_MovOnset_Alinged_EachROI_MeanAXTrial',...
-        'CaEvents_MovOnset_Alinged','CaEvents_MovOnset_Alinged_EachROI_MeanAXTrial',...
-        'ZScore_MovOnset_Alinged','ZScore_MovOnset_Alinged_EachROI_MeanAXTrial','-v7.3');
+    save([TargetPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged','df_f_MovOnset_Alinged_EachROI_MeanAXTrial','-v7.3');
 end
 
 %% Averaged activity after movement onset, combine trials across sessions first then average
@@ -135,7 +121,7 @@ for curr_animal = 1:length(Animals)
             end
         end
 
-        % Get stage
+        % Get stage, in this case, only naive
         Post_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(:,1) = nanmean(cell2mat(Post_MovOnset_Aligend_df_field{curr_animal}(curr_field,1)),2);
         if ismember(curr_animal,[12:20,22])
             Post_MovOnset_Aligend_df_field_stage{curr_animal}{curr_field,1}(RejectedROI.(Fields{curr_field}),1) = nan;
@@ -150,7 +136,7 @@ for curr_animal = 1:length(Animals)
     Post_MovOnset_Aligend_df_stage{curr_animal} = cell2mat(Post_MovOnset_Aligend_df_field_stage{curr_animal});
     % Average
     Post_MovOnset_Aligend_df_stage_Mean(curr_animal,:) = nanmean(Post_MovOnset_Aligend_df_stage{curr_animal});
-    clear df_f_MovOnset_Alinged CaEvents_MovOnset_Alinged ZScore_MovOnset_Alinged
+    clear df_f_MovOnset_Alinged
 end
 
 FigurePath = ['Z:\People\Chi\TwoP_IN\' IN filesep Stage filesep 'Figures_SubPre'];
@@ -343,281 +329,4 @@ saveas(gcf, [FigurePath filesep 'Pool_' IN '_Mean_dfof_Post_Temporal.png']); pau
 saveas(gcf, [FigurePath filesep 'Pool_' IN '_Mean_dfof_Post_Temporal.pdf']); pause(1);
 
 save([FigurePath filesep IN '_ActivityAnalysis_SubPre.mat'],'-append');
-
-%% Fraction of MVM modulated neurons
-clear movement_activated_cells_index movement_suppressed_cells_index
-% Plot fraction
-for curr_animal = 1:length(Animals)
-    Animal = Animals{curr_animal};
-    DataPath = fullfile('Z:\People\Chi\TwoP_IN\',IN,Animal,Stage,'df_f');
-    load([DataPath filesep Animal '_Activity_bootstats.mat'],'Label','-mat');
-    for curr_field = 1:length(nan_cells{curr_animal})
-        if ~isnan(Label.MvmModuLabel_Act{curr_field})
-            temp = Label.MvmModuLabel_Act{curr_field};
-            temp(nan_cells{curr_animal}{curr_field},:) = [];
-            movement_activated_cells_index{curr_animal}{curr_field,1} = temp;
-            temp = Label.MvmModuLabel_Sup{curr_field};
-            temp(nan_cells{curr_animal}{curr_field},:) = [];
-            movement_suppressed_cells_index{curr_animal}{curr_field,1} = temp;
-        else
-            movement_activated_cells_index{curr_animal}{curr_field,1} = [];
-            movement_suppressed_cells_index{curr_animal}{curr_field,1} = [];
-        end
-    end
-    movement_activated_cell_fraction(curr_animal,:) = nan(1,1);
-    movement_suppressed_cell_fraction(curr_animal,:) = nan(1,1);
-    movement_activated_cells_index{curr_animal} = cell2mat(movement_activated_cells_index{curr_animal});
-    movement_suppressed_cells_index{curr_animal} = cell2mat(movement_suppressed_cells_index{curr_animal});
-    movement_activated_cell_fraction(curr_animal,1:size(movement_activated_cells_index{curr_animal},2)) = nansum(movement_activated_cells_index{curr_animal})./size(movement_activated_cells_index{curr_animal},1);
-    movement_suppressed_cell_fraction(curr_animal,1:size(movement_activated_cells_index{curr_animal},2)) = -nansum(movement_suppressed_cells_index{curr_animal})./size(movement_suppressed_cells_index{curr_animal},1);
-    nan_index = sum(isnan(movement_activated_cells_index{curr_animal}))==size(movement_activated_cells_index{curr_animal},1);
-    movement_activated_cell_fraction(curr_animal,nan_index) = nan;
-    movement_suppressed_cell_fraction(curr_animal,nan_index) = nan;
-    cell_num_control = sum(~isnan(movement_activated_cells_index{curr_animal}));
-    movement_activated_cell_fraction(curr_animal,cell_num_control<10) = nan;
-    cell_num_control = sum(~isnan(movement_suppressed_cells_index{curr_animal}));
-    movement_suppressed_cell_fraction(curr_animal,cell_num_control<10) = nan;
-    clear Label cell_num_control        
-end
-movement_activated_cells_index_h = cell2mat(movement_activated_cells_index(hM4Di_index)');
-movement_activated_cells_index_m = cell2mat(movement_activated_cells_index(mCherry_index)');
-movement_suppressed_cells_index_h = cell2mat(movement_suppressed_cells_index(hM4Di_index)');
-movement_suppressed_cells_index_m = cell2mat(movement_suppressed_cells_index(mCherry_index)');
-movement_modulated_cells_index_h = movement_activated_cells_index_h+movement_suppressed_cells_index_h;
-movement_modulated_cells_index_m = movement_activated_cells_index_m+movement_suppressed_cells_index_m;
-
-temp_bar(1,:) = [sum(movement_modulated_cells_index_m==1),sum(movement_modulated_cells_index_m(==-1),...
-        sum(movement_modulated_cells_index_m==0)];
-temp_bar(2,:) = [sum(movement_modulated_cells_index_h(:,ii)==1),sum(movement_modulated_cells_index_h==-1),...
-        sum(movement_modulated_cells_index_h==0)];
-    
-figure; hold on; set(gcf,'color','w','position',[200 200 200 200]);
-temp_bar(1,:) = temp_bar(1,:)/sum(temp_bar(1,:))*100;
-temp_bar(2,:) = temp_bar(2,:)/sum(temp_bar(2,:))*100;
-bar(temp_bar(1:2,:),'stacked','barwidth',0.7);
-xlim([0.4,2.6]);ylim([0 100]); % [0.75,0,0;0,0.34,0.42;0.8,0.8,0.8]
-xticks([1:2]);xticklabels({'mCherry','hM4Di'});ylabel('Fraction');
-axis square;
-
-clear pval
-temp_bar(1,:) = [sum(movement_modulated_cells_index_m==1),sum(movement_modulated_cells_index_m==-1),...
-        sum(movement_modulated_cells_index_m==0)];
-temp_bar(2,:) = [sum(movement_modulated_cells_index_h(:,ii)==1),sum(movement_modulated_cells_index_h==-1),...
-        sum(movement_modulated_cells_index_h==0)];
-x1 = [repmat('m',sum(temp_bar(1,:)),1);repmat('h',sum(temp_bar(2,:)),1)];
-x2 = [movement_modulated_cells_index_m;movement_modulated_cells_index_h];
-[tbl,~,pval(1),~] = crosstab(x1,x2);
-line([0.9,2.1],[100 100],'color','k')
-text(1.5,100,[num2str(pval)],'horizontalalignment','center','fontsize',8);
-
-saveas(gcf, [FigurePath filesep 'Pool_' IN '_Fraction_MvmActSup_Bar.fig']); pause(1);
-saveas(gcf, [FigurePath filesep 'Pool_' IN '_Fraction_MvmActSup_Bar.png']); pause(1);
-saveas(gcf, [FigurePath filesep 'Pool_' IN '_Fraction_MvmActSup_Bar.pdf']); pause(1);
-
-% combo
-animal_combo_h = nchoosek([1:length(hM4Di_animals)],round(length(hM4Di_animals)/2));
-animal_combo_m = nchoosek([1:length(hM4Di_animals)],round(length(hM4Di_animals)/2));
-
-for ii_combo = 1:size(animal_combo_h,1)
-    curr_combo_h = animal_combo_h(ii_combo,:);
-    curr_combo_m = animal_combo_m(ii_combo,:);
-    curr_h_index = ismember(Animals,hM4Di_animals(curr_combo_h));
-    curr_m_index = ismember(Animals,mCherry_animals(curr_combo_m));
-    curr_movement_activated_cells_index_h = cell2mat(movement_activated_cells_index(curr_h_index)');
-    curr_movement_activated_cells_index_m = cell2mat(movement_activated_cells_index(curr_m_index)');
-    curr_movement_suppressed_cells_index_h = cell2mat(movement_suppressed_cells_index(curr_h_index)');
-    curr_movement_suppressed_cells_index_m = cell2mat(movement_suppressed_cells_index(curr_m_index)');
-    curr_movement_modulated_cells_index_h = curr_movement_activated_cells_index_h+curr_movement_suppressed_cells_index_h;
-    curr_movement_modulated_cells_index_m = curr_movement_activated_cells_index_m+curr_movement_suppressed_cells_index_m;
-    
-    combo_mvm_modu_h(ii_combo,:) = [sum(curr_movement_modulated_cells_index_h==1),sum(curr_movement_modulated_cells_index_h==-1),sum(curr_movement_modulated_cells_index_h==0)]/length(curr_movement_modulated_cells_index_h)*100;
-    combo_mvm_modu_m(ii_combo,:) = [sum(curr_movement_modulated_cells_index_m==1),sum(curr_movement_modulated_cells_index_m==-1),sum(curr_movement_modulated_cells_index_m==0)]/length(curr_movement_modulated_cells_index_m)*100;
-end
-
-figure; hold on; set(gcf,'color','w','position',[200 200 400 200]);
-subplot(1,2,1); hold on;
-temp_var = combo_mvm_modu_m;
-plot(temp_var(:,1),temp_var(:,2),'linestyle','none','marker','.','color',[0.5 0.5 0.5]);
-plot(temp_bar(1,1)/sum(temp_bar(1,:))*100,temp_bar(1,2)/sum(temp_bar(1,:))*100,'marker','x','color','k');
-xlim([0 50]);ylim([0 6]);
-xlabel('Act. fraction');ylabel('Sup. fraction'); axis square;
-xticks([0:25:50]);
-title('mCherry');
-
-subplot(1,2,2); hold on;
-temp_var = combo_mvm_modu_h;
-plot(temp_var(:,1),temp_var(:,2),'linestyle','none','marker','.','color',color_value);
-plot(temp_bar(2,1)/sum(temp_bar(2,:))*100,temp_bar(2,2)/sum(temp_bar(2,:))*100,'marker','x','color','k');
-xlim([0 50]);ylim([0 6]);
-xlabel('Act. fraction');ylabel('Sup. fraction'); axis square;
-xticks([0:25:50]);
-title('hM4Di');
-
-saveas(gcf, [FigurePath filesep 'combo_Pool_' IN '_Fraction_MvmActSup_Bar.fig']); pause(1);
-saveas(gcf, [FigurePath filesep 'combo_Pool_' IN '_Fraction_MvmActSup_Bar.png']); pause(1);
-saveas(gcf, [FigurePath filesep 'combo_Pool_' IN '_Fraction_MvmActSup_Bar.pdf']); pause(1);
-
-% Activity onset time
-clear movement_activated_cells_onset movement_suppressed_cells_onset
-for curr_animal = 1:length(Animals)
-    Animal = Animals{curr_animal};
-    DataPath = fullfile('Z:\People\Chi\TwoP_IN\',IN,Animal,'df_f');
-    load([DataPath filesep Animal '_Activity_bootstats.mat'],'Label','Time','-mat');
-    for curr_field = 1:length(nan_cells{curr_animal})
-        temp = Time.MvmModuLabel_ActOnset{curr_field};
-        temp(nan_cells{curr_animal}{curr_field},:) = [];
-        movement_activated_cells_onset{curr_animal}{curr_field,1} = temp;
-        temp = Time.MvmModuLabel_SupOnset{curr_field};
-        temp(nan_cells{curr_animal}{curr_field},:) = [];
-        movement_suppressed_cells_onset{curr_animal}{curr_field,1} = temp;
-    end
-    movement_activated_cells_onset{curr_animal} = cell2mat(movement_activated_cells_onset{curr_animal});
-    movement_suppressed_cells_onset{curr_animal} = cell2mat(movement_suppressed_cells_onset{curr_animal});
-%     temp_index = logical(nansum(movement_activated_cells_index{curr_animal},2));
-%     movement_activated_cells_onset{curr_animal} = movement_activated_cells_onset{curr_animal}(temp_index,:);
-%     temp_index = logical(nansum(movement_suppressed_cells_index{curr_animal},2));
-%     movement_suppressed_cells_onset{curr_animal} = movement_suppressed_cells_onset{curr_animal}(temp_index,:);
-    clear Label Time
-end
-session_assign = {[1],[2:4],[5:8],[9:11]};
-for curr_animal = 1:length(Animals)
-    for ii = 1:3
-        movement_activated_cells_onset_stage{curr_animal,ii} = nanmean(movement_activated_cells_onset{curr_animal}(:,session_assign{ii}),2);
-        movement_suppressed_cells_onset_stage{curr_animal,ii} = nanmean(movement_suppressed_cells_onset{curr_animal}(:,session_assign{ii}),2);
-    end
-    movement_activated_cells_onset_stage{curr_animal,4} = nanmean(movement_activated_cells_onset{curr_animal}(:,[9:end]),2);
-    movement_suppressed_cells_onset_stage{curr_animal,4} = nanmean(movement_suppressed_cells_onset{curr_animal}(:,[9:end]),2);
-    for ii = 1:4
-        movement_activated_cells_onset_stage{curr_animal,ii}(isnan(movement_activated_cells_onset_stage{curr_animal,ii})) = [];
-        movement_suppressed_cells_onset_stage{curr_animal,ii}(isnan(movement_suppressed_cells_onset_stage{curr_animal,ii})) = [];
-    end    
-end
-for curr_animal = 1:length(Animals)
-     for ii = 1:4
-         movement_activated_cells_onset_stage_median(curr_animal,ii) = nanmedian(movement_activated_cells_onset_stage{curr_animal,ii});
-         movement_suppressed_cells_onset_stage_median(curr_animal,ii) = nanmedian(movement_suppressed_cells_onset_stage{curr_animal,ii});
-     end
-end
-
-figure('position',[200,200,640,200],'Color','w'); hold on;
-subplot(1,3,1); hold on;
-temp_var = movement_activated_cells_onset_stage_median;
-for curr_animal = 1:size(temp_var,1)
-    plot([1:4],temp_var(curr_animal,:),'color',[0.5,0.5,0.5],'LineWidth',0.5);
-end
-temp_1 = nanmean(temp_var);
-temp_2 = nanstd(temp_var)./sqrt(sum(~isnan((temp_var))));
-plot([1:4],temp_1,'color',[191,0,0]./255,'linewidth',2);
-for ii = 1:4
-    line([ii ii], [temp_1(ii)-temp_2(ii), temp_1(ii)+temp_2(ii)],'color',[191,0,0]./255,'LineWidth',2);
-end
-xlim([0.5 4.5]); ylim([0 1.2]);
-xticks([1:4]); xticklabels({'Naive','Early','Middle','Late'});
-ylabel('Meidan activity onset (s)'); title('Activated');
-axis square;
-subplot(1,3,2); hold on;
-temp_var = movement_suppressed_cells_onset_stage_median;
-for curr_animal = 1:size(temp_var,1)
-    plot([1:4],temp_var(curr_animal,:),'color',[0.5,0.5,0.5],'LineWidth',0.5);
-end
-temp_1 = nanmean(temp_var);
-temp_2 = nanstd(temp_var)./sqrt(sum(~isnan((temp_var))));
-plot([1:4],temp_1,'color',[0,87,107]./255,'linewidth',2);
-for ii = 1:4
-    line([ii ii], [temp_1(ii)-temp_2(ii), temp_1(ii)+temp_2(ii)],'color',[0,87,107]./255,'LineWidth',2);
-end
-xlim([0.5 4.5]); ylim([0 1.5]);
-xticks([1:4]); xticklabels({'Naive','Early','Middle','Late'});
-ylabel('Meidan activity onset (s)'); title('Suppressed');
-axis square;
-saveas(gcf, [FigurePath filesep IN '_MvmActSup_onset.fig']); pause(1);
-saveas(gcf, [FigurePath filesep IN '_MvmActSup_onset.png']); pause(1);
-saveas(gcf, [FigurePath filesep IN '_MvmActSup_onset.pdf']); pause(1);
-
-% Check trace
-for curr_animal = 1:length(Animals)
-    Animal = Animals{curr_animal};
-    DataPath = fullfile('Z:\People\Chi\TwoP_IN\',IN,Animal,'df_f');
-    load([DataPath filesep Animal '_MovOnsetAligendTraces.mat'],'df_f_MovOnset_Alinged_EachROI_MeanAXTrial','df_f_MovOnset_Alinged','-mat');
-    clear temp;
-    for curr_field = 1:size(df_f_MovOnset_Alinged_EachROI_MeanAXTrial,1)
-        for curr_session = 1:size(df_f_MovOnset_Alinged_EachROI_MeanAXTrial,2)
-            if isempty(df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_session})
-                temp_activated_cells_trace{curr_animal}{curr_session,curr_field} = [];
-                temp_suppressed_cells_trace{curr_animal}{curr_session,curr_field} = [];
-            else
-                temp{curr_field,curr_session} = df_f_MovOnset_Alinged_EachROI_MeanAXTrial{curr_field,curr_session};
-                temp{curr_field,curr_session}(nan_cells{curr_animal,1}{curr_field,1},:) = [];
-                if size(temp{curr_field,curr_session},2) == 72
-                    temp{curr_field,curr_session} = temp{curr_field,curr_session}(:,[1:2:72]);
-                end
-                temp{curr_field,curr_session} = temp{curr_field,curr_session}-repmat(nanmean(temp{curr_field,curr_session}(:,3:5),2),1,36);
-            end
-        end
-    end
-    for curr_session = 1:size(temp,2)
-        if strcmp(Animal,'KP_3459921_1') && curr_session == 11
-            movement_activated_cells_trace{curr_animal,curr_session} = [];
-            movement_suppressed_cells_trace{curr_animal,curr_session} = [];
-        else
-            temp_matrix = cell2mat(temp(:,curr_session));
-            movement_activated_cells_trace{curr_animal,curr_session} = temp_matrix(movement_activated_cells_index{curr_animal}(:,curr_session)==1,:);
-            movement_suppressed_cells_trace{curr_animal,curr_session} = temp_matrix(movement_suppressed_cells_index{curr_animal}(:,curr_session)==-1,:);
-            clear temp_matrix
-        end
-        if ~isempty(movement_activated_cells_trace{curr_animal,curr_session})
-            temp_matrix_1(curr_session,:) = nanmean(movement_activated_cells_trace{curr_animal,curr_session},1);
-        else
-            temp_matrix_1(curr_session,:) = nan(1,36);
-        end
-        if ~isempty(movement_suppressed_cells_trace{curr_animal,curr_session})
-            temp_matrix_2(curr_session,:) = nanmean(movement_suppressed_cells_trace{curr_animal,curr_session},1);
-        else
-            temp_matrix_2(curr_session,:) = nan(1,36);
-        end
-        
-    end
-    clear temp
-    
-    for ii = 1:3
-        movement_activated_cells_trace_stages{ii}(curr_animal,:) = nanmean(temp_matrix_1(session_assign{ii},:),1);
-        movement_suppressed_cells_trace_stages{ii}(curr_animal,:) = nanmean(temp_matrix_2(session_assign{ii},:),1);
-    end
-    ii = 4;
-    movement_activated_cells_trace_stages{ii}(curr_animal,:) = nanmean(temp_matrix_1(9:size(temp_matrix_1,1),:),1);
-    movement_suppressed_cells_trace_stages{ii}(curr_animal,:) = nanmean(temp_matrix_2(9:size(temp_matrix_1,1),:),1);
-    clear temp_matrix_1 temp_matrix_2 df_f_MovOnset_Alinged_EachROI_MeanAXTrial df_f_MovOnset_Alinged
-end
-
-% across animals
-figure; hold on; set(gcf,'color','w','position',[200 200 200 400]);
-subplot(2,1,1); hold on;
-for ii = 1:4
-    temp = movement_activated_cells_trace_stages{ii};
-    temp_1 = nanmean(temp);
-    temp_2 = nanstd(temp)./sqrt(sum(~isnan(temp(:,1))));
-    h = area([(temp_1-temp_2)',(2*temp_2)']);
-    set(h(1),'EdgeColor','none','FaceColor','none');
-    set(h(2),'EdgeColor','none','FaceColor',color_value(ii,:),'FaceAlpha',0.3);
-    plot(temp_1,'color',color_value(ii,:),'linewidth',2);
-end
-line([8,8],ylim,'color','k','linestyle',':','linewidth',1); ylim([-0.05, 0.6]);
-xlim([1,36]); xticks([8,22,36]); xticklabels({'0','1','2'}); xlabel('Time (sec)');
-ylabel('Mean df/f'); axis square; title('Activated');
-subplot(2,1,2); hold on;
-for ii = 1:4
-    temp = movement_suppressed_cells_trace_stages{ii};
-    temp_1 = nanmean(temp);
-    temp_2 = nanstd(temp)./sqrt(sum(~isnan(temp(:,1))));
-    h = area([(temp_1-temp_2)',(2*temp_2)']);
-    set(h(1),'EdgeColor','none','FaceColor','none');
-    set(h(2),'EdgeColor','none','FaceColor',color_value(ii,:),'FaceAlpha',0.3);
-    plot(temp_1,'color',color_value(ii,:),'linewidth',2);
-end
-line([8,8],ylim,'color','k','linestyle',':','linewidth',1); ylim([-0.6, 0.05]);
-xlim([1,36]); xticks([8,22,36]); xticklabels({'0','1','2'}); xlabel('Time (sec)');
-ylabel('Mean df/f'); axis square; title('Suppressed');
-saveas(gcf, [FigurePath filesep IN '_MvmActSup_trace.fig']); pause(1);
-saveas(gcf, [FigurePath filesep IN '_MvmActSup_trace.png']); pause(1);
-saveas(gcf, [FigurePath filesep IN '_MvmActSup_trace.pdf']); pause(1);
 
