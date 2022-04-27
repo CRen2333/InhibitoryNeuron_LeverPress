@@ -34,12 +34,7 @@ for ii = 1:length(Animals)
     Reaction_Time(ii,:) = nan(1,21);
     Cue_to_CuedRewardedMov(ii,:) = nan(1,21);
     CuedRewardedMov_to_Reward(ii,:) = nan(1,21);
-    MovSpeed(ii,:) = nan(1,21);
     Corr_Reward_Matrix(:,:,ii) = nan(21,21);
-    Corr_All_Matrix(:,:,ii) = nan(21,21);
-    Reaction_Time_var(ii,:) = nan(1,21);
-    Cue_to_CuedRewardedMov_var(ii,:) = nan(1,21);
-    CuedRewardedMov_to_Reward_var(ii,:) = nan(1,21);
     Trial_Num(ii,:) = nan(1,21);
     MaxDisp(ii,:) = nan(1,21);
         
@@ -54,43 +49,27 @@ for ii = 1:length(Animals)
             temp = CuedMov_SingleAnimal{jj}.Cued_MovOnset_Info_All;
             index_first = temp(:,4)==1;
             Reaction_Time(ii,jj) = nanmedian(temp(index_first,2)-temp(index_first,6));
-            Reaction_Time_var(ii,jj) = std(temp(index_first,2)-temp(index_first,6));
             % Cue to cued rewarded mov onset
             index_reward = temp(:,5)==1;
-            Mov_order(ii,jj) = nanmedian(temp(index_reward,4));
-            Mov_order_mean(ii,jj) = nanmean(temp(index_reward,4));
-            Mov_order_var(ii,jj) = nanstd(temp(index_reward,4));
             Cue_to_CuedRewardedMov(ii,jj) = nanmedian(temp(index_reward,2)-temp(index_reward,6));
             CuedRewardedMov_to_Reward(ii,jj) = nanmedian(temp(index_reward,7)-temp(index_reward,2));
-            Cue_to_CuedRewardedMov_var(ii,jj) = std(temp(index_reward,2)-temp(index_reward,6));
-            CuedRewardedMov_to_Reward_var(ii,jj) = std(temp(index_reward,7)-temp(index_reward,2));
             Trial_Num(ii,jj) = size(CuedMov_SingleAnimal{jj}.LeverTrace_Reward_downsample,2);
 
-            % Speed & Max displacement
-            MovSpeed(ii,jj) = nanmean(nanmean(abs(diff(CuedMov_SingleAnimal{jj}.LeverTrace_Reward_downsample))))./10;
+            % Max displacement
             temp_trace = CuedMov_SingleAnimal{jj}.LeverTrace_Reward_downsample;
             temp_trace = temp_trace-repmat(temp_trace(1,:),201,1);
-            MaxDisp(ii,jj) = nanmean(max(abs(temp_trace),[],1));
-            
-            % fraction of give up trials
-            
+            MaxDisp(ii,jj) = nanmean(max(abs(temp_trace),[],1));           
+          
         end               
         clear temp index_first index_reward temp_trace
     end
-        % Correlation
-        days = size(Trial_Trial_Corr_Reward,1);
-        Corr_Reward_Matrix(1:days,1:days,ii) = Trial_Trial_Corr_Reward;
-        Corr_Reward_within(ii,:) = diag(Corr_Reward_Matrix(:,:,ii));
-        Corr_Reward_across(ii,:) = diag(Corr_Reward_Matrix(:,:,ii),1);
-        
-        Corr_All_Matrix(1:days,1:days,ii) = Trial_Trial_Corr_All;
-        Corr_All_within(ii,:) = diag(Corr_All_Matrix(:,:,ii));
-        Corr_All_across(ii,:) = diag(Corr_All_Matrix(:,:,ii),1);        
-        
-        Corr_First_Matrix(1:days,1:days,ii) = Trial_Trial_Corr_First;
-        Corr_First_within(ii,:) = diag(Corr_First_Matrix(:,:,ii));
-        Corr_First_across(ii,:) = diag(Corr_First_Matrix(:,:,ii),1);        
-        toc
+    % Correlation
+    days = size(Trial_Trial_Corr_Reward,1);
+    Corr_Reward_Matrix(1:days,1:days,ii) = Trial_Trial_Corr_Reward;
+    Corr_Reward_within(ii,:) = diag(Corr_Reward_Matrix(:,:,ii));
+    Corr_Reward_across(ii,:) = diag(Corr_Reward_Matrix(:,:,ii),1);
+
+    toc
 end
 clear CuedMov_SingleAnimal
 
@@ -110,6 +89,7 @@ for curr_animal = 1:length(Animals)
         temp_index = temp_index(1:min(length(TrialInfo_xsg_all{ii}),length(Lever_Active{ii})));
         TrialInfo_xsg_all{ii} = TrialInfo_xsg_all{ii}(temp_index);
         Lever_Active{ii} = Lever_Active{ii}(temp_index);
+        
         for jj = 1:min(length(TrialInfo_xsg_all{ii}),length(Lever_Active{ii}))
             if jj == min(length(TrialInfo_xsg_all{ii}),length(Lever_Active{ii}))
                 session_end = TrialInfo_xsg_all{ii}{jj}(end,1);
